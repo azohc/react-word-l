@@ -1,0 +1,34 @@
+.letterbox {
+  background-color: var(--c-white);
+  color: var(--c-black);
+  border: 4px var(--c-black-mute) solid;
+  border-radius: 8px;
+  font-size: 2rem;
+  height: 48px;
+  width: 48px;
+  text-align: center;
+}
+
+.init {
+  background-color: var(--c-white);
+  color: var(--c-black);
+  border-color: var(--c-black-mute);
+}
+
+.hit {
+  background-color: var(--c-green);
+}
+
+.miss {
+  background-color: var(--c-gray);
+}
+
+.almost {
+  background-color: var(--c-orange);
+}
+
+.hit,
+.miss,
+.almost {
+  color: var(--c-white);
+}
