@@ -27,6 +27,10 @@
   background-color: var(--c-orange);
 }
 
+.skip {
+  opacity: 0.3;
+}
+
 .hit,
 .miss,
 .almost {
