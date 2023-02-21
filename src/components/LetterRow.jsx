@@ -12,12 +12,12 @@ export default function LetterRow({ letters }) {
       }}
     >
       {letters.map((letter, i) => (
-        <LetterBox key={i} letter={letter.toUpperCase()} />
+        <LetterBox key={i} {...letter} />
       ))}
     </div>
   )
 }
 
 LetterRow.propTypes = {
-  letters: PropTypes.arrayOf(PropTypes.string),
+  letters: PropTypes.array,
 }
