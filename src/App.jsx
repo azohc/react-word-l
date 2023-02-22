@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from "react"
 import "./App.css"
+import Keyboard from "./components/Keyboard"
 import LetterRow from "./components/LetterRow"
 import SpinningW from "./components/SpinningW"
 import useKeypress from "./hooks/useKeypress"
 
-const LETTERSTATE_INIT = "init"
-const LETTERSTATE_HIT = "hit"
-const LETTERSTATE_MISS = "miss"
-const LETTERSTATE_ALMOST = "almost"
-const LETTERSTATE_GHOST = "ghost"
+export const LETTERSTATE_INIT = "init"
+export const LETTERSTATE_HIT = "hit"
+export const LETTERSTATE_MISS = "miss"
+export const LETTERSTATE_ALMOST = "almost"
+export const LETTERSTATE_GHOST = "ghost"
 const SOLUTION = "WORDL"
 const SOLUTION_LETTERS = new Set(SOLUTION)
 
@@ -19,6 +20,14 @@ function App() {
   const [guessIndex, setGuessIndex] = useState(0)
   const [guess, setGuess] = useState(getBlankGuess())
   const [guessHistory, setGuessHistory] = useState([])
+
+  const [keyGuessMap, setKeyGuessMap] = useState(
+    new Map(
+      Array.from("QWERTYUIOPASDFGHJKLZXCVBNM").map(
+        (letter) => [letter, LETTERSTATE_GHOST]
+      )
+    )
+  )
 
   useKeypress((key, ctrlKey) => {
     if (key === "Backspace") {
@@ -60,13 +69,18 @@ function App() {
 
   function submitGuess() {
     const newGuessHistoryEntry = guess.slice()
+    const newKeyGuessMap = new Map(keyGuessMap)
+
     guess.forEach((l, i) => {
       if (l.letter === SOLUTION.charAt(i)) {
         newGuessHistoryEntry[i].state = LETTERSTATE_HIT
+        newKeyGuessMap.set(l.letter, LETTERSTATE_HIT)
       } else if ([...SOLUTION_LETTERS].includes(l.letter)) {
         newGuessHistoryEntry[i].state = LETTERSTATE_ALMOST
+        newKeyGuessMap.set(l.letter, LETTERSTATE_ALMOST)
       } else {
         newGuessHistoryEntry[i].state = LETTERSTATE_MISS
+        newKeyGuessMap.set(l.letter, LETTERSTATE_MISS)
       }
     })
     setGuessIndex(0)
@@ -74,6 +88,7 @@ function App() {
     setGuessHistory(
       guessHistory.concat([newGuessHistoryEntry])
     )
+    setKeyGuessMap(newKeyGuessMap)
   }
 
   const AlwaysScrollToBottom = () => {
@@ -102,7 +117,10 @@ function App() {
         <LetterRow
           letters={Array.from("🎉YOU WIN!🎉").map((l) => ({
             letter: l,
-            state: LETTERSTATE_HIT,
+            state:
+              l === " "
+                ? LETTERSTATE_GHOST
+                : LETTERSTATE_HIT,
           }))}
         />
       )
@@ -115,7 +133,10 @@ function App() {
         <LetterRow
           letters={Array.from("😢YOU LOSE😢").map((l) => ({
             letter: l,
-            state: LETTERSTATE_MISS,
+            state:
+              l === " "
+                ? LETTERSTATE_GHOST
+                : LETTERSTATE_MISS,
           }))}
         />
       )
@@ -129,6 +150,7 @@ function App() {
       <SpinningW />
       <GuessHistory />
       <Game />
+      <Keyboard keys={keyGuessMap} />
     </div>
   )
 }
