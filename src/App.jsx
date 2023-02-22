@@ -10,18 +10,31 @@ export const LETTERSTATE_HIT = "hit"
 export const LETTERSTATE_MISS = "miss"
 export const LETTERSTATE_ALMOST = "almost"
 export const LETTERSTATE_GHOST = "ghost"
+
 const SOLUTION = "WORDL"
 const SOLUTION_LETTERS = new Set(SOLUTION)
+
+const YOU_WIN = Array.from("🎉YOU WIN!🎉").map((char) => ({
+  letter: char,
+  state: char === " " ? LETTERSTATE_GHOST : LETTERSTATE_HIT,
+}))
+
+const YOU_LOSE = Array.from("😢YOU LOSE😢").map((l) => ({
+  letter: l,
+  state: l === " " ? LETTERSTATE_GHOST : LETTERSTATE_MISS,
+}))
 
 const getBlankGuess = () =>
   Array(5).fill({ letter: "", state: LETTERSTATE_GHOST })
 
 function App() {
-  const [guessIndex, setGuessIndex] = useState(0)
-  const [guess, setGuess] = useState(getBlankGuess())
+  const [currentGuess, setCurrentGuess] = useState(
+    getBlankGuess()
+  )
+  const [currentGuessIndex, setCurrentGuessIndex] =
+    useState(0)
   const [guessHistory, setGuessHistory] = useState([])
-
-  const [keyGuessMap, setKeyGuessMap] = useState(
+  const [guessedKeyMap, setGuessedKeyMap] = useState(
     new Map(
       Array.from("QWERTYUIOPASDFGHJKLZXCVBNM").map(
         (letter) => [letter, LETTERSTATE_GHOST]
@@ -31,64 +44,79 @@ function App() {
 
   useKeypress((key, ctrlKey) => {
     if (key === "Backspace") {
-      const newGuess = guess.slice()
-      const newGuessIndex =
-        guessIndex > 0 ? guessIndex - 1 : guessIndex
-      newGuess[newGuessIndex] = {
-        letter: "",
-        state: LETTERSTATE_INIT,
-      }
-      setGuess(newGuess)
-      setGuessIndex(newGuessIndex)
+      eraseLastLetterOfCurrentGuess()
     } else if (
       key === "Enter" &&
-      guess.every((g) => g.letter !== "")
+      currentGuess.every(({ letter }) => letter !== "")
     ) {
-      submitGuess()
+      submitCurrentGuess()
     } else if (ctrlKey && key.toLowerCase() === "c") {
-      setGuessIndex(0)
-      setGuessHistory(
-        guessHistory.concat([
-          guess.map((l) => ({
-            ...l,
-            state: LETTERSTATE_GHOST,
-          })),
-        ])
-      )
-      setGuess(getBlankGuess())
-    } else if (guessIndex < 5 && key.match(/^[a-zA-Z]$/)) {
-      const newGuess = guess.slice()
-      newGuess[guessIndex] = {
-        letter: key.toUpperCase(),
-        state: LETTERSTATE_INIT,
-      }
-      setGuess(newGuess)
-      setGuessIndex(guessIndex + 1)
+      interruptCurrentGuess()
+    } else if (
+      currentGuessIndex < 5 &&
+      key.match(/^[a-zA-Z]$/)
+    ) {
+      processLetter(key)
     }
   })
 
-  function submitGuess() {
-    const newGuessHistoryEntry = guess.slice()
-    const newKeyGuessMap = new Map(keyGuessMap)
+  function eraseLastLetterOfCurrentGuess() {
+    const newGuess = currentGuess.slice()
+    const newIndex =
+      currentGuessIndex > 0
+        ? currentGuessIndex - 1
+        : currentGuessIndex
+    newGuess[newIndex] = {
+      letter: "",
+      state: LETTERSTATE_INIT,
+    }
+    setCurrentGuess(newGuess)
+    setCurrentGuessIndex(newIndex)
+  }
 
-    guess.forEach((l, i) => {
-      if (l.letter === SOLUTION.charAt(i)) {
-        newGuessHistoryEntry[i].state = LETTERSTATE_HIT
-        newKeyGuessMap.set(l.letter, LETTERSTATE_HIT)
-      } else if ([...SOLUTION_LETTERS].includes(l.letter)) {
-        newGuessHistoryEntry[i].state = LETTERSTATE_ALMOST
-        newKeyGuessMap.set(l.letter, LETTERSTATE_ALMOST)
+  function interruptCurrentGuess() {
+    setCurrentGuessIndex(0)
+    setGuessHistory(
+      guessHistory.concat([
+        currentGuess.map((guessPart) => ({
+          ...guessPart,
+          state: LETTERSTATE_GHOST,
+        })),
+      ])
+    )
+    setCurrentGuess(getBlankGuess())
+  }
+
+  function processLetter(letter) {
+    const newGuess = currentGuess.slice()
+    newGuess[currentGuessIndex] = {
+      letter: letter.toUpperCase(),
+      state: LETTERSTATE_INIT,
+    }
+    setCurrentGuess(newGuess)
+    setCurrentGuessIndex(currentGuessIndex + 1)
+  }
+
+  function submitCurrentGuess() {
+    const newHistoryEntry = currentGuess.slice()
+    const newMap = new Map(guessedKeyMap)
+
+    currentGuess.forEach(({ letter }, i) => {
+      if (letter === SOLUTION.charAt(i)) {
+        newHistoryEntry[i].state = LETTERSTATE_HIT
+        newMap.set(letter, LETTERSTATE_HIT)
+      } else if ([...SOLUTION_LETTERS].includes(letter)) {
+        newHistoryEntry[i].state = LETTERSTATE_ALMOST
+        newMap.set(letter, LETTERSTATE_ALMOST)
       } else {
-        newGuessHistoryEntry[i].state = LETTERSTATE_MISS
-        newKeyGuessMap.set(l.letter, LETTERSTATE_MISS)
+        newHistoryEntry[i].state = LETTERSTATE_MISS
+        newMap.set(letter, LETTERSTATE_MISS)
       }
     })
-    setGuessIndex(0)
-    setGuess(getBlankGuess())
-    setGuessHistory(
-      guessHistory.concat([newGuessHistoryEntry])
-    )
-    setKeyGuessMap(newKeyGuessMap)
+    setCurrentGuessIndex(0)
+    setCurrentGuess(getBlankGuess())
+    setGuessHistory(guessHistory.concat([newHistoryEntry]))
+    setGuessedKeyMap(newMap)
   }
 
   const AlwaysScrollToBottom = () => {
@@ -99,49 +127,30 @@ function App() {
 
   const GuessHistory = () => (
     <>
-      {guessHistory.map((guessHistoryEntry, i) => (
-        <LetterRow key={i} letters={guessHistoryEntry} />
+      {guessHistory.map((guess, i) => (
+        <LetterRow key={i} letters={guess} />
       ))}
       <AlwaysScrollToBottom />
     </>
   )
 
-  const solved = () =>
-    guessHistory
-      .at(-1)
-      ?.every((l) => l.state === LETTERSTATE_HIT)
-
   const Game = () => {
-    if (solved()) {
-      return (
-        <LetterRow
-          letters={Array.from("🎉YOU WIN!🎉").map((l) => ({
-            letter: l,
-            state:
-              l === " "
-                ? LETTERSTATE_GHOST
-                : LETTERSTATE_HIT,
-          }))}
-        />
-      )
+    if (
+      guessHistory
+        .at(-1)
+        ?.every(({ state }) => state === LETTERSTATE_HIT)
+    ) {
+      return <LetterRow letters={YOU_WIN} />
     } else if (
-      guessHistory.filter((gh) =>
-        gh.every((l) => l.state !== LETTERSTATE_GHOST)
+      guessHistory.filter((guess) =>
+        guess.every(
+          ({ state }) => state !== LETTERSTATE_GHOST
+        )
       ).length === 7
     ) {
-      return (
-        <LetterRow
-          letters={Array.from("😢YOU LOSE😢").map((l) => ({
-            letter: l,
-            state:
-              l === " "
-                ? LETTERSTATE_GHOST
-                : LETTERSTATE_MISS,
-          }))}
-        />
-      )
+      return <LetterRow letters={YOU_LOSE} />
     } else {
-      return <LetterRow letters={guess} />
+      return <LetterRow letters={currentGuess} />
     }
   }
 
@@ -150,7 +159,7 @@ function App() {
       <SpinningW />
       <GuessHistory />
       <Game />
-      <Keyboard keys={keyGuessMap} />
+      <Keyboard keys={guessedKeyMap} />
     </div>
   )
 }
