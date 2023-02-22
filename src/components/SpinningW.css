@@ -1,15 +1,15 @@
-.logo {
-  height: 6em;
-  padding: 1.5em;
+.w {
+  height: 5rem;
+  padding: 1rem;
   will-change: filter;
   transition: filter 300ms;
 }
 
-.logo.react:hover {
+.w:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-@keyframes logo-spin {
+@keyframes w-spin {
   from {
     transform: rotate(0deg);
   }
@@ -19,7 +19,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .logo {
-    animation: logo-spin infinite 20s linear;
+  .w {
+    animation: w-spin infinite 20s linear;
   }
 }

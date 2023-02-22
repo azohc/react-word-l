@@ -5,9 +5,9 @@ const useKeypress = (handler) => {
     const eventListener = ({ key, ctrlKey }) => {
       handler(key, ctrlKey)
     }
-    window.addEventListener("keydown", eventListener)
+    window.addEventListener("keyup", eventListener)
     return () => {
-      window.removeEventListener("keydown", eventListener)
+      window.removeEventListener("keyup", eventListener)
     }
   }, [handler])
 }

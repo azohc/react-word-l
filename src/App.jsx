@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react"
 import "./App.css"
 import LetterRow from "./components/LetterRow"
-import ReactLogo from "./components/ReactLogo"
+import SpinningW from "./components/SpinningW"
 import useKeypress from "./hooks/useKeypress"
 
 const solution = "WORDL"
+const solutionLetters = new Set(solution)
 
 const getBlankGuess = () =>
   Array(5).fill({ letter: "", state: "ghost" })
@@ -50,10 +51,21 @@ function App() {
   })
 
   function submitGuess() {
-    // PROCESS each KEY
+    const newGuessHistoryEntry = guess.slice()
+    guess.forEach((l, i) => {
+      if (l.letter === solution.charAt(i)) {
+        newGuessHistoryEntry[i].state = "hit"
+      } else if ([...solutionLetters].includes(l.letter)) {
+        newGuessHistoryEntry[i].state = "almost"
+      } else {
+        newGuessHistoryEntry[i].state = "miss"
+      }
+    })
     setGuessIndex(0)
     setGuess(getBlankGuess())
-    setGuessHistory(guessHistory.concat([guess]))
+    setGuessHistory(
+      guessHistory.concat([newGuessHistoryEntry])
+    )
   }
 
   const AlwaysScrollToBottom = () => {
@@ -73,7 +85,7 @@ function App() {
 
   return (
     <div className="app">
-      <ReactLogo />
+      <SpinningW />
       <GuessHistory />
       <LetterRow letters={guess} />
     </div>
