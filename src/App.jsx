@@ -1,8 +1,10 @@
-import React, { useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import "./App.css"
 import LetterRow from "./components/LetterRow"
 import ReactLogo from "./components/ReactLogo"
 import useKeypress from "./hooks/useKeypress"
+
+const solution = "WORDL"
 
 const getBlankGuess = () =>
   Array(5).fill({ letter: "", state: "ghost" })
@@ -38,26 +40,41 @@ function App() {
       setGuess(getBlankGuess())
     } else if (guessIndex < 5 && key.match(/^[a-zA-Z]$/)) {
       const newGuess = guess.slice()
-      newGuess[guessIndex] = { letter: key, state: "init" }
+      newGuess[guessIndex] = {
+        letter: key.toUpperCase(),
+        state: "init",
+      }
       setGuess(newGuess)
       setGuessIndex(guessIndex + 1)
     }
   })
 
   function submitGuess() {
+    // PROCESS each KEY
     setGuessIndex(0)
     setGuess(getBlankGuess())
     setGuessHistory(guessHistory.concat([guess]))
   }
 
-  return (
-    <div className="app">
-      <ReactLogo />
+  const AlwaysScrollToBottom = () => {
+    const elementRef = useRef()
+    useEffect(() => elementRef.current.scrollIntoView())
+    return <div ref={elementRef} />
+  }
 
+  const GuessHistory = () => (
+    <>
       {guessHistory.map((guessHistoryEntry, i) => (
         <LetterRow key={i} letters={guessHistoryEntry} />
       ))}
+      <AlwaysScrollToBottom />
+    </>
+  )
 
+  return (
+    <div className="app">
+      <ReactLogo />
+      <GuessHistory />
       <LetterRow letters={guess} />
     </div>
   )
