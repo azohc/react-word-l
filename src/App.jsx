@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
+import Game from "./components/Game"
+import GuessHistory from "./components/GuessHistory"
 import Keyboard from "./components/Keyboard"
 import LetterRow from "./components/LetterRow"
 import SpinningW from "./components/SpinningW"
@@ -22,16 +24,6 @@ const AppContainer = styled.div`
 
 const SOLUTION = "WORDL"
 const SOLUTION_LETTERS = new Set(SOLUTION)
-
-const YOU_WIN = Array.from("🎉YOU WIN!🎉").map((char) => ({
-  letter: char,
-  state: char === " " ? LETTERSTATE_GHOST : LETTERSTATE_HIT,
-}))
-
-const YOU_LOSE = Array.from("😢YOU LOSE😢").map((l) => ({
-  letter: l,
-  state: l === " " ? LETTERSTATE_GHOST : LETTERSTATE_MISS,
-}))
 
 const getBlankGuess = () =>
   Array(5).fill({ letter: "", state: LETTERSTATE_GHOST })
@@ -123,46 +115,12 @@ function App() {
     setGuessedKeyMap(newMap)
   }
 
-  const AlwaysScrollToBottom = () => {
-    const elementRef = useRef()
-    useEffect(() => elementRef.current.scrollIntoView())
-    return <div ref={elementRef} />
-  }
-
-  const GuessHistory = () => (
-    <>
-      {guessHistory.map((guess, i) => (
-        <LetterRow key={i} letters={guess} />
-      ))}
-      <AlwaysScrollToBottom />
-    </>
-  )
-
-  const winCondition = () =>
-    guessHistory
-      .at(-1)
-      ?.every(({ state }) => state === LETTERSTATE_HIT)
-
-  const loseCondition = () =>
-    guessHistory.filter((guess) =>
-      guess.every(({ state }) => state !== LETTERSTATE_GHOST)
-    ).length === 7
-
-  const Game = () => {
-    if (winCondition()) {
-      return <LetterRow letters={YOU_WIN} />
-    } else if (loseCondition()) {
-      return <LetterRow letters={YOU_LOSE} />
-    } else {
-      return <LetterRow letters={currentGuess} />
-    }
-  }
-
+  // TODO use useContext for game state ?
   return (
     <AppContainer>
       <SpinningW />
-      <GuessHistory />
-      <Game />
+      <GuessHistory guessHistory={guessHistory} />
+      <Game currentGuess={currentGuess} guessHistory={guessHistory} />
       <Keyboard keys={guessedKeyMap} />
     </AppContainer>
   )
