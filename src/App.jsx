@@ -1,15 +1,24 @@
 import React, { useEffect, useRef, useState } from "react"
-import "./App.css"
+import styled from "styled-components"
 import Keyboard from "./components/Keyboard"
 import LetterRow from "./components/LetterRow"
 import SpinningW from "./components/SpinningW"
+import {
+  LETTERSTATE_INIT,
+  LETTERSTATE_HIT,
+  LETTERSTATE_MISS,
+  LETTERSTATE_ALMOST,
+  LETTERSTATE_GHOST,
+} from "./constants"
 import useKeypress from "./hooks/useKeypress"
 
-export const LETTERSTATE_INIT = "init"
-export const LETTERSTATE_HIT = "hit"
-export const LETTERSTATE_MISS = "miss"
-export const LETTERSTATE_ALMOST = "almost"
-export const LETTERSTATE_GHOST = "ghost"
+const AppContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+`
 
 const SOLUTION = "WORDL"
 const SOLUTION_LETTERS = new Set(SOLUTION)
@@ -155,12 +164,12 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <AppContainer>
       <SpinningW />
       <GuessHistory />
       <Game />
       <Keyboard keys={guessedKeyMap} />
-    </div>
+    </AppContainer>
   )
 }
 
