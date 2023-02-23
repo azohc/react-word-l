@@ -20,24 +20,24 @@ const Square = styled.div`
   text-align: center;
 
   &.${LETTERSTATE_INIT} {
-    background-color: var(--c-white);
     color: var(--c-black);
+    background-color: var(--c-white);
     border-color: var(--c-black-mute);
   }
 
   &.${LETTERSTATE_HIT} {
-    background-color: var(--c-green);
     color: var(--c-white);
+    background-color: var(--c-green);
   }
 
   &.${LETTERSTATE_MISS} {
-    background-color: var(--c-gray);
     color: var(--c-white);
+    background-color: var(--c-gray);
   }
 
   &.${LETTERSTATE_ALMOST} {
-    background-color: var(--c-orange);
     color: var(--c-white);
+    background-color: var(--c-orange);
   }
 
   &.${LETTERSTATE_GHOST} {
