@@ -37,17 +37,15 @@ const getBlankGuess = () =>
   Array(5).fill({ letter: "", state: LETTERSTATE_GHOST })
 
 function App() {
-  const [currentGuess, setCurrentGuess] = useState(
-    getBlankGuess()
-  )
-  const [currentGuessIndex, setCurrentGuessIndex] =
-    useState(0)
+  const [currentGuess, setCurrentGuess] = useState(getBlankGuess())
+  const [currentGuessIndex, setCurrentGuessIndex] = useState(0)
   const [guessHistory, setGuessHistory] = useState([])
   const [guessedKeyMap, setGuessedKeyMap] = useState(
     new Map(
-      Array.from("QWERTYUIOPASDFGHJKLZXCVBNM").map(
-        (letter) => [letter, LETTERSTATE_GHOST]
-      )
+      Array.from("QWERTYUIOPASDFGHJKLZXCVBNM").map((letter) => [
+        letter,
+        LETTERSTATE_GHOST,
+      ])
     )
   )
 
@@ -61,10 +59,7 @@ function App() {
       submitCurrentGuess()
     } else if (ctrlKey && key.toLowerCase() === "c") {
       interruptCurrentGuess()
-    } else if (
-      currentGuessIndex < 5 &&
-      key.match(/^[a-zA-Z]$/)
-    ) {
+    } else if (currentGuessIndex < 5 && key.match(/^[a-zA-Z]$/)) {
       processLetter(key)
     }
   })
@@ -143,20 +138,20 @@ function App() {
     </>
   )
 
+  const winCondition = () =>
+    guessHistory
+      .at(-1)
+      ?.every(({ state }) => state === LETTERSTATE_HIT)
+
+  const loseCondition = () =>
+    guessHistory.filter((guess) =>
+      guess.every(({ state }) => state !== LETTERSTATE_GHOST)
+    ).length === 7
+
   const Game = () => {
-    if (
-      guessHistory
-        .at(-1)
-        ?.every(({ state }) => state === LETTERSTATE_HIT)
-    ) {
+    if (winCondition()) {
       return <LetterRow letters={YOU_WIN} />
-    } else if (
-      guessHistory.filter((guess) =>
-        guess.every(
-          ({ state }) => state !== LETTERSTATE_GHOST
-        )
-      ).length === 7
-    ) {
+    } else if (loseCondition()) {
       return <LetterRow letters={YOU_LOSE} />
     } else {
       return <LetterRow letters={currentGuess} />

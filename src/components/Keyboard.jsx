@@ -4,9 +4,7 @@ import PropTypes from "prop-types"
 
 const toLetters = (keysMap, filter) =>
   [...keysMap.entries()]
-    .filter(([letter]) =>
-      Array.from(filter).includes(letter)
-    )
+    .filter(([letter]) => Array.from(filter).includes(letter))
     .map(([letter, state]) => ({ letter, state }))
 
 export default function Keyboard({ keys }) {
