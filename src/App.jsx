@@ -3,7 +3,6 @@ import styled from "styled-components"
 import Game from "./components/Game"
 import GuessHistory from "./components/GuessHistory"
 import Keyboard from "./components/Keyboard"
-import LetterRow from "./components/LetterRow"
 import SpinningW from "./components/SpinningW"
 import {
   LETTERSTATE_INIT,
