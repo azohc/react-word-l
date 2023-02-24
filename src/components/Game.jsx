@@ -6,6 +6,7 @@ import {
   LETTERSTATE_HIT,
   LETTERSTATE_MISS,
 } from "../constants"
+import { useGuess } from "../context/guess"
 
 const YOU_WIN = Array.from("🎉YOU WIN!🎉").map((char) => ({
   letter: char,
@@ -17,7 +18,9 @@ const YOU_LOSE = Array.from("😢YOU LOSE😢").map((l) => ({
   state: l === " " ? LETTERSTATE_GHOST : LETTERSTATE_MISS,
 }))
 
-export default function Game({ currentGuess, guessHistory }) {
+export default function Game({ guessHistory }) {
+  const guess = useGuess()
+
   const winCondition = () =>
     guessHistory
       .at(-1)
@@ -28,20 +31,19 @@ export default function Game({ currentGuess, guessHistory }) {
       guess.every(({ state }) => state !== LETTERSTATE_GHOST)
     ).length === 7
 
-  const Game = () => {
+  const LetterRowOrWinOrLoseRow = () => {
     if (winCondition()) {
       return <LetterRow letters={YOU_WIN} />
     } else if (loseCondition()) {
       return <LetterRow letters={YOU_LOSE} />
     } else {
-      return <LetterRow letters={currentGuess} />
+      return <LetterRow letters={guess.current} />
     }
   }
 
-  return <Game />
+  return <LetterRowOrWinOrLoseRow />
 }
 
 Game.propTypes = {
-  currentGuess: PropTypes.array,
   guessHistory: PropTypes.array,
 }
