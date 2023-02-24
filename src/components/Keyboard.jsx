@@ -9,7 +9,7 @@ const toLetters = (letterMap, filter) =>
 
 export default function Keyboard() {
   // TODO make clickable?
-  const guess = useGuess()
+  const { letterMap } = useGuess()
 
   return (
     <div
@@ -21,9 +21,9 @@ export default function Keyboard() {
         alignItems: "center",
       }}
     >
-      <LetterRow letters={toLetters(guess.letterMap, "QWERTYUIOP")} />
-      <LetterRow letters={toLetters(guess.letterMap, "ASDFGHJKL")} />
-      <LetterRow letters={toLetters(guess.letterMap, "ZXCVBNM")} />
+      <LetterRow letters={toLetters(letterMap, "QWERTYUIOP")} />
+      <LetterRow letters={toLetters(letterMap, "ASDFGHJKL")} />
+      <LetterRow letters={toLetters(letterMap, "ZXCVBNM")} />
     </div>
   )
 }

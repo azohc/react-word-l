@@ -3,7 +3,7 @@ import { useGuess } from "../context/guess"
 import LetterRow from "./LetterRow"
 
 export default function GuessHistory() {
-  const guess = useGuess()
+  const { history } = useGuess()
 
   const AlwaysScrollToBottom = () => {
     const elementRef = useRef()
@@ -13,7 +13,7 @@ export default function GuessHistory() {
 
   return (
     <>
-      {guess.history.map((guess, i) => (
+      {history.map((guess, i) => (
         <LetterRow key={i} letters={guess} />
       ))}
       <AlwaysScrollToBottom />

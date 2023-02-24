@@ -29,6 +29,22 @@ export function GuessProvider({ children }) {
     )
   )
 
+  /// ------------- \
+  // computed state }
+  // ~~~~~~~~~~~~~ /
+
+  function isSubmittable() {
+    return current.every(({ letter }) => letter !== "")
+  }
+
+  function isIncomplete() {
+    return index < 5
+  }
+
+  /// ------- \
+  // mutators }
+  // ~~~~~~~ /
+
   function reset() {
     setIndex(0)
     setCurrent(GET_BLANK_GUESS())
@@ -86,6 +102,10 @@ export function GuessProvider({ children }) {
     reset()
   }
 
+  /// ------ \
+  // helpers }
+  // ~~~~~~ /
+
   function pushToHistory(guess) {
     setHistory(history.concat([guess]))
   }
@@ -93,15 +113,25 @@ export function GuessProvider({ children }) {
   return (
     <GuessContext.Provider
       value={{
-        current: current,
-        index: index,
+        /*  
+        // ------ */
+        // state ::
+        current,
+        history,
+        letterMap,
+        /*  
+        // --------------- */
+        // computed state ::
+        isSubmittable,
+        isIncomplete,
+        /*  
+        // --------- */
+        // mutators ::
         reset,
         addLetter,
         eraseLetter,
         submit,
         interrupt,
-        history,
-        letterMap,
       }}
     >
       {children}

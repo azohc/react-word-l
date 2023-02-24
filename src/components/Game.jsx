@@ -19,28 +19,26 @@ const YOU_LOSE = Array.from("😢YOU LOSE😢").map((l) => ({
   state: l === " " ? LETTERSTATE_GHOST : LETTERSTATE_MISS,
 }))
 
-const winCondition = (guess) =>
-  guess.history
-    .at(-1)
-    ?.every(({ state }) => state === LETTERSTATE_HIT)
+const winCondition = (history) =>
+  history.at(-1)?.every(({ state }) => state === LETTERSTATE_HIT)
 
-const loseCondition = (guessHistory) =>
-  guessHistory.filter((guess) =>
+const loseCondition = (history) =>
+  history.filter((guess) =>
     guess.every(({ state }) => state !== LETTERSTATE_GHOST)
   ).length === MAX_GUESSES
 
 export default function GuessOrGameStateLetterRow() {
-  const guess = useGuess()
+  const { current, history } = useGuess()
 
-  const jsx = () => {
-    if (winCondition()) {
+  const Row = () => {
+    if (winCondition(history)) {
       return <LetterRow letters={YOU_WIN} />
-    } else if (loseCondition()) {
+    } else if (loseCondition(history)) {
       return <LetterRow letters={YOU_LOSE} />
     } else {
-      return <LetterRow letters={guess.current} />
+      return <LetterRow letters={current} />
     }
   }
 
-  return <jsx />
+  return <Row />
 }
