@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from "react"
+import { useGuess } from "../context/guess"
 import LetterRow from "./LetterRow"
-import PropTypes from "prop-types"
 
-export default function GuessHistory({ guessHistory }) {
+export default function GuessHistory() {
+  const guess = useGuess()
+
   const AlwaysScrollToBottom = () => {
     const elementRef = useRef()
     useEffect(() => elementRef.current.scrollIntoView())
@@ -11,14 +13,10 @@ export default function GuessHistory({ guessHistory }) {
 
   return (
     <>
-      {guessHistory.map((guess, i) => (
+      {guess.history.map((guess, i) => (
         <LetterRow key={i} letters={guess} />
       ))}
       <AlwaysScrollToBottom />
     </>
   )
-}
-
-GuessHistory.propTypes = {
-  guessHistory: PropTypes.array,
 }

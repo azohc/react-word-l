@@ -1,6 +1,6 @@
 import React from "react"
 import styled from "styled-components"
-import Game from "./components/Game"
+import GuessOrGameStateLetterRow from "./components/Game"
 import GuessHistory from "./components/GuessHistory"
 import Keyboard from "./components/Keyboard"
 import SpinningW from "./components/SpinningW"
@@ -20,7 +20,7 @@ function App() {
 
   useKeypress((key, ctrlKey) => {
     if (key === "Backspace") {
-      guess.eraseLastLetter()
+      guess.eraseLetter()
     } else if (
       key === "Enter" &&
       guess.current.every(({ letter }) => letter !== "")
@@ -36,9 +36,9 @@ function App() {
   return (
     <AppContainer>
       <SpinningW />
-      <GuessHistory guessHistory={guess.history} />
-      <Game guessHistory={guess.history} />
-      <Keyboard keys={guess.keys} />
+      <GuessHistory />
+      <GuessOrGameStateLetterRow />
+      <Keyboard />
     </AppContainer>
   )
 }

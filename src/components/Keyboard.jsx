@@ -1,13 +1,16 @@
 import React from "react"
+import { useGuess } from "../context/guess"
 import LetterRow from "./LetterRow"
-import PropTypes from "prop-types"
 
-const toLetters = (keysMap, filter) =>
-  [...keysMap.entries()]
+const toLetters = (letterMap, filter) =>
+  [...letterMap.entries()]
     .filter(([letter]) => Array.from(filter).includes(letter))
     .map(([letter, state]) => ({ letter, state }))
 
-export default function Keyboard({ keys }) {
+export default function Keyboard() {
+  // TODO make clickable?
+  const guess = useGuess()
+
   return (
     <div
       style={{
@@ -18,13 +21,9 @@ export default function Keyboard({ keys }) {
         alignItems: "center",
       }}
     >
-      <LetterRow letters={toLetters(keys, "QWERTYUIOP")} />
-      <LetterRow letters={toLetters(keys, "ASDFGHJKL")} />
-      <LetterRow letters={toLetters(keys, "ZXCVBNM")} />
+      <LetterRow letters={toLetters(guess.letterMap, "QWERTYUIOP")} />
+      <LetterRow letters={toLetters(guess.letterMap, "ASDFGHJKL")} />
+      <LetterRow letters={toLetters(guess.letterMap, "ZXCVBNM")} />
     </div>
   )
-}
-
-Keyboard.propTypes = {
-  keys: PropTypes.instanceOf(Map),
 }

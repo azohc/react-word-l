@@ -13,14 +13,14 @@ const GuessContext = createContext()
 const SOLUTION = "WORDL"
 const SOLUTION_LETTERS = new Set(SOLUTION)
 
-const getBlankGuess = () =>
+const GET_BLANK_GUESS = () =>
   Array(5).fill({ letter: "", state: LETTERSTATE_GHOST })
 
 export function GuessProvider({ children }) {
-  const [currentGuess, setCurrentGuess] = useState(getBlankGuess())
-  const [currentGuessIndex, setCurrentGuessIndex] = useState(0)
-  const [guessHistory, setGuessHistory] = useState([])
-  const [guessedKeyMap, setGuessedKeyMap] = useState(
+  const [current, setCurrent] = useState(GET_BLANK_GUESS())
+  const [index, setIndex] = useState(0)
+  const [history, setHistory] = useState([])
+  const [letterMap, setLetterMap] = useState(
     new Map(
       Array.from("QWERTYUIOPASDFGHJKLZXCVBNM").map((letter) => [
         letter,
@@ -29,62 +29,56 @@ export function GuessProvider({ children }) {
     )
   )
 
-  // -------------
-  // current guess
+  function reset() {
+    setIndex(0)
+    setCurrent(GET_BLANK_GUESS())
+  }
 
-  function eraseLastLetter() {
-    const newGuess = currentGuess.slice()
-    const newIndex =
-      currentGuessIndex > 0
-        ? currentGuessIndex - 1
-        : currentGuessIndex
+  function addLetter(letter) {
+    const newGuess = current.slice()
+    newGuess[index] = {
+      letter: letter.toUpperCase(),
+      state: LETTERSTATE_INIT,
+    }
+    setCurrent(newGuess)
+    setIndex(index + 1)
+  }
+
+  function eraseLetter() {
+    const newGuess = current.slice()
+    const newIndex = index > 0 ? index - 1 : index
     newGuess[newIndex] = {
       letter: "",
       state: LETTERSTATE_INIT,
     }
-    setCurrentGuess(newGuess)
-    setCurrentGuessIndex(newIndex)
-  }
-
-  function addLetter(letter) {
-    const newGuess = currentGuess.slice()
-    newGuess[currentGuessIndex] = {
-      letter: letter.toUpperCase(),
-      state: LETTERSTATE_INIT,
-    }
-    setCurrentGuess(newGuess)
-    setCurrentGuessIndex(currentGuessIndex + 1)
+    setCurrent(newGuess)
+    setIndex(newIndex)
   }
 
   function submit() {
-    const newHistoryEntry = currentGuess.slice()
-    const newMap = new Map(guessedKeyMap)
+    const newHistoryEntry = current.slice()
+    const newLetterMap = new Map(letterMap)
 
-    currentGuess.forEach(({ letter }, i) => {
+    current.forEach(({ letter }, i) => {
       if (letter === SOLUTION.charAt(i)) {
         newHistoryEntry[i].state = LETTERSTATE_HIT
-        newMap.set(letter, LETTERSTATE_HIT)
+        newLetterMap.set(letter, LETTERSTATE_HIT)
       } else if ([...SOLUTION_LETTERS].includes(letter)) {
         newHistoryEntry[i].state = LETTERSTATE_ALMOST
-        newMap.set(letter, LETTERSTATE_ALMOST)
+        newLetterMap.set(letter, LETTERSTATE_ALMOST)
       } else {
         newHistoryEntry[i].state = LETTERSTATE_MISS
-        newMap.set(letter, LETTERSTATE_MISS)
+        newLetterMap.set(letter, LETTERSTATE_MISS)
       }
     })
-    pushHistoryEntry(newHistoryEntry)
-    setGuessedKeyMap(newMap)
+    pushToHistory(newHistoryEntry)
+    setLetterMap(newLetterMap)
     reset()
   }
 
-  function reset() {
-    setCurrentGuessIndex(0)
-    setCurrentGuess(getBlankGuess())
-  }
-
   function interrupt() {
-    pushHistoryEntry(
-      currentGuess.map((guessPart) => ({
+    pushToHistory(
+      current.map((guessPart) => ({
         ...guessPart,
         state: LETTERSTATE_GHOST,
       }))
@@ -92,25 +86,22 @@ export function GuessProvider({ children }) {
     reset()
   }
 
-  // -------------
-  // guess history
-  function pushHistoryEntry(guess) {
-    setGuessHistory(guessHistory.concat([guess]))
+  function pushToHistory(guess) {
+    setHistory(history.concat([guess]))
   }
 
   return (
     <GuessContext.Provider
       value={{
-        current: currentGuess,
-        index: currentGuessIndex,
-        eraseLastLetter,
-        addLetter,
+        current: current,
+        index: index,
         reset,
-        interrupt,
+        addLetter,
+        eraseLetter,
         submit,
-        history: guessHistory,
-        pushHistoryEntry,
-        keys: guessedKeyMap,
+        interrupt,
+        history,
+        letterMap,
       }}
     >
       {children}
