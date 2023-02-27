@@ -16,16 +16,23 @@ const AppContainer = styled.div`
 `
 
 function App() {
-  const { eraseLetter, submit, interrupt, addLetter } = useGuess()
+  const {
+    eraseLetter,
+    submit,
+    interrupt,
+    addLetter,
+    isIncomplete,
+    isSubmittable,
+  } = useGuess()
 
   useKeypress((key, ctrlKey) => {
     if (key === "Backspace") {
       eraseLetter()
-    } else if (key === "Enter" && guess.isSubmittable()) {
+    } else if (key === "Enter" && isSubmittable()) {
       submit()
     } else if (ctrlKey && key.toLowerCase() === "c") {
       interrupt()
-    } else if (guess.isIncomplete() && key.match(/^[a-zA-Z]$/)) {
+    } else if (isIncomplete() && key.match(/^[a-zA-Z]$/)) {
       addLetter(key)
     }
   })
